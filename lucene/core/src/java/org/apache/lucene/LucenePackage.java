@@ -17,6 +17,10 @@ package org.apache.lucene;
  * limitations under the License.
  */
 
+/**
+ * test
+ */
+
 /** Lucene's package information, including version. **/
 public final class LucenePackage {
 
