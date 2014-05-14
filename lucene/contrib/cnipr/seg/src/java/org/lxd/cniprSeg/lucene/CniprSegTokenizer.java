@@ -23,12 +23,12 @@ public class CniprSegTokenizer extends Tokenizer{
 	
 	public CniprSegTokenizer(Reader input)  {
 		super(input);
-		seg = new BgramSeg(input);
-
 		termAtt = addAttribute(CharTermAttribute.class);
 		offsetAtt = addAttribute(OffsetAttribute.class);
 		typeAtt = addAttribute(TypeAttribute.class);
-		seg.getSegResult();
+//		seg = new BgramSeg(input);//会造成第一次切分无结果
+//		seg.getSegResult();//会造成第一次切分无结果
+		seg = new BgramSeg();
 	}
 	
 	public void reset() throws IOException {

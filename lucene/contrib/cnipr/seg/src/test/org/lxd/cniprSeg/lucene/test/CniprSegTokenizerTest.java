@@ -21,6 +21,7 @@ public class CniprSegTokenizerTest {
 	public void test() throws IOException
 	{
 		String txt = "我是中国人民子弟兵";
+		txt="小麦根秸清除深埋机";
 		CniprSegTokenizer tokenizer = new CniprSegTokenizer(  new StringReader(txt) );
 		
 		for(Token t= new Token(); (t=TokenUtils.nextToken(tokenizer, t)) !=null;) {

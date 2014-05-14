@@ -2,6 +2,7 @@ package org.lxd.cniprSeg.solr;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -10,6 +11,9 @@ import org.apache.lucene.analysis.util.ResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoaderAware;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.AttributeSource.AttributeFactory;
+import org.lxd.cniprSeg.BgramDictionaryFactory;
+import org.lxd.cniprSeg.MainDictionaryFactory;
+import org.lxd.cniprSeg.TagDictionaryFactory;
 import org.lxd.cniprSeg.lucene.CniprSegTokenizer;
 
 /**
@@ -27,6 +31,14 @@ public class CniprSegTokenizerFactory  extends TokenizerFactory implements Resou
 	
 	public CniprSegTokenizerFactory(Map<String, String> args) {
 		super(args);
+		
+		try {
+			MainDictionaryFactory.getMainDictionary();
+			BgramDictionaryFactory.getBgramDictionary();
+			TagDictionaryFactory.getTagDictionary();
+		} catch (IOException e) {
+			log.info("error happens when load seg dic,error is" + e);
+		}
 	}
 
 	@Override
@@ -46,10 +58,6 @@ public class CniprSegTokenizerFactory  extends TokenizerFactory implements Resou
 
 		return tokenizer;
 	}
-	
-
-	
-	
 	
 	private CniprSegTokenizer newTokenizer(Reader input) {
 		

@@ -3,6 +3,7 @@ package org.lxd.cniprSeg;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.lxd.cniprSeg.lucene.CniprSegTokenizer;
 
 
@@ -34,7 +36,7 @@ public class BgramSeg {
 	 * 2-gram分词器构造函数
 	 * @throws IOException
 	 */
-	public BgramSeg( ) 
+	public BgramSeg() 
 	{
 
 		try {
@@ -48,6 +50,7 @@ public class BgramSeg {
 		
 		isOutputPunctuation = false;
 		segResult = new LinkedList<WordByWordSegNode>();
+		sentences.setLength(0);
 	}
 	
 	/**
@@ -117,15 +120,23 @@ public class BgramSeg {
 	 * 修改时间:2014-3-1 上午9:50:17
 	 */
 	private void readDataFromInput( Reader input ){
+		
 		BufferedReader br = new BufferedReader( input );
 		String line = null;
 		try {
+			
 			while( (line=br.readLine())!=null ){
 				sentences.append(line);
 			}
-			br.close();
+			
 		} catch (IOException e) {
 			log.info("exception when reading input to seg,e is "+e);
+		}finally{
+//			try {
+//				br.close();//不能关闭吗？不应该在此处关闭
+//			} catch (IOException e) {
+//				log.info("exception when close input,e is "+e);
+//			}
 		}
 	}
 	
@@ -246,8 +257,23 @@ public class BgramSeg {
 				}
 				else if( !mainDicnode.isEndWord()){//待优化
 					end++;
-					if( start==sentence.length()-1 ) 
+					if( start==sentence.length()-1 ){
 						isSegFinished=true;
+					}else{
+						//不存在单一单字，存在以这个单字开头的词的情况，需要进一步判断待切分语句的以这个单字开头的另一个词是否在词典中存在，如果不存在，要把这个字
+						//切分出来，如“秸清”的“秸”字
+						if( end <=sentence.length()-1 ){
+							String nextWord = sentence.substring(start,end);
+							
+							if( mainDic.getNode(nextWord)==null ){
+								//单词的下一个词也不存在，那么把这个单字加入到分词结果中，或者作为分词边界
+								WordByWordSegNode result = new WordByWordSegNode( word,start,end-1,mainDicnode,null );
+								wbwSegResult.add(result);
+							}
+						}
+						
+						
+					} 
 					continue;
 				}
 				else{
